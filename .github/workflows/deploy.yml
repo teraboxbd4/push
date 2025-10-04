@@ -1,0 +1,34 @@
+name: Deploy Functions to Firebase
+
+on:
+  push:
+    branches:
+      - main # আপনার মূল ব্রাঞ্চের নাম main না হলে পরিবর্তন করুন
+    paths:
+      - 'functions/**'
+
+jobs:
+  deploy_functions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Authenticate with Google Cloud
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_EARN_ZONE_A6DCE }}'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Install Dependencies
+        run: cd functions && npm install
+
+      - name: Deploy to Firebase Functions
+        run: firebase deploy --project earn-zone-a6dce --only functions --non-interactive --force
